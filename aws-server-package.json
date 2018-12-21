@@ -1,0 +1,12 @@
+{
+  "name": "aws-server-common",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "aws-sdk": "^2.322.0",
+    "node-fetch": "^2.2.0"
+  },
+  "scripts": {
+    "start": "node app.js"
+  }
+}
