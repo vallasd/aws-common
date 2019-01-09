@@ -1,4 +1,4 @@
-// aws-secret.js (helper class to save and store secrets to AWS SecretManager)
+// aws-secret.js (helper class to retrieve and store secrets to AWS SecretManager)
 
 // The MIT License (MIT)
 // Copyright (c) 2018 David C. Vallas (david_vallas@yahoo.com) (dcvallas@twitter)
@@ -26,6 +26,11 @@ module.exports = {
   // returns a promise to get the secret for a specific secretId in AWS
   secret: function(secretId) {
     return _secret(secretId);
+  },
+
+  // returns a promise to store the secret for a specific secretId in AWS
+  storeSecret: function(secretId, secretString) {
+    return _storeSecret(secretId, secretString);
   }
 
 }
@@ -42,7 +47,7 @@ var AWS = require('aws-sdk'),
     binarySecretData;
 
 // Load the config file if debug is simulator (we don't include this file in production)
-if (fs.existsSync('./aws_config.json')) AWS.config.loadFromPath('./aws_config.json');
+if (fs.existsSync('./aws-config.json')) AWS.config.loadFromPath('./aws-config.json');
 
 // Create a Secrets Manager client
 var client = new AWS.SecretsManager({
@@ -83,4 +88,16 @@ function _secret(secretId) {
   });
 
   return promise;
+}
+
+// returns a promise to store the secret for a specific secretId in AWS.  Logs error if storage fails.
+function _storeSecret(secretId, secretString) {
+
+  let promise = new Promise(function(resolve, reject) {
+    let params = { SecretId: secretId, SecretString: secretString };
+    client.putSecretValue(params, function(err, data) {
+      if (err) console.log('ERROR: secret storage: ' + err);
+      resolve();
+    });
+  });
 }

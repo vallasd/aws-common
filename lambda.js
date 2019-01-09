@@ -81,23 +81,8 @@ exports.handler = async (event, context) => {
   }
 
   catch(err) {
-
-    // scrub secrets from err message in case they were passed from a thrown err
-    let scrubbed = helper.scrub(secret, err.message);
-    err.message = scrubbed;
-
-    // set the err code to 500 if it wasn't already set
-    err.code = (err.code ? err.code : 500);
-
-    // log error codes of 500
-    if (err.code == 500) {
-      console.log('Date: ' + Date());
-      console.log(err);
-      console.log(Date(), 'event data: ' + JSON.stringify(event)); // get event data for later testing
-    }
-
     // create an error response
-    response = helper.internalServerErrorResponse(err);
+    response = helper.internalServerErrorResponse(err, event, secret);
   }
 
   // remove returnType, we dont need to pass it to client
@@ -173,6 +158,7 @@ async function processResponse(event, secret, endpoint) {
 
       // requestHandler sent parameters that aren't recognized, throw err
       else {
+        console.log('handlerResponse is: ' + handlerResponse);
         throw new Error('requestHandler for |' + endpoint + '| does not have a request or response');
       }
 

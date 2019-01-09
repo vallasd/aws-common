@@ -101,6 +101,8 @@ do
     cp -R ./node_modules ../samcli/${directory}/. 2> /dev/null
     cp ./lambda.js ../samcli/${directory}/. 2> /dev/null
     cp ./requestHandler.js ../samcli/${directory}/. 2> /dev/null
+    cp ./package.json ../samcli/${directory}/. 2> /dev/null
+    cp ./package-lock.json ../samcli/${directory}/. 2> /dev/null
     cp ${COMMONDIR}/aws-config.json ../samcli/${directory}/. 2> /dev/null
 
     # remove lambda-package

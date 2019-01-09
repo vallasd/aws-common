@@ -19,14 +19,13 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 const fetch = require('node-fetch');
+const debug = (process.env.debug == 'true');
 const _returnType = {
   text: 'text',
   html: 'html',
   xml: 'xml',
   json: 'json'
 };
-
-const debug = (process.env.debug == 'true');
 
 module.exports = {
 
@@ -60,7 +59,7 @@ module.exports = {
   returnResponse: function(requestParams) { return _returnResponse(requestParams); },
 
   // returns an internal Server Error response for a thrown error, formatted for AWS Lambda response
-  internalServerErrorResponse: function(err) { return _internalServerErrorResponse(err); },
+  internalServerErrorResponse: function(err, event, secret) { return _internalServerErrorResponse(err, event, secret); },
 
   // will attempt to turn bodyData to a string or JSON, if it fails returns body data as a binary
   convertBodyData: function(bodyData) { return _convertBodyData(bodyData); },
@@ -78,7 +77,10 @@ module.exports = {
   convertJSONToParameters: function(json, conversionType) { return _convertJSONToParameters(json, conversionType); },
 
   // scrubs a dictionary of secrets from the string, anywhere a secret is shown in string, 'SECRET' will be displayed
-  scrub: function(secret, string) { return _scrub(secret, string); }
+  scrub: function(secret, string) { return _scrub(secret, string); },
+
+  // converts potentialJSON in body to JSON structure.  Throws error if it can not convert.
+  convertToJSON: function(potentialJSON) { return _convertToJSON(potentialJSON); }
 };
 
 function _headerType(contentType) {
@@ -133,15 +135,10 @@ function _returnResponse(requestParams) {
 
       // fetch the request and save as result
       let result = await fetch(url, requestParams);
+
       // get the result headers to determine how to parse the result
       if (debug) console.log(Date(), 'returnResponse |' + requestName + '| Content-Type: |' + result.headers.get('Content-Type') + '|');
       let returnType = _headerType(result.headers.get('Content-Type'));
-	  for (var [key, value] of result.headers) {
-		if(key != 'content-type' && key != 'content-length')
-		{
-			headers[key] = value;
-		}
-	  }
       _updateContentTypeHeader(headers, returnType);
 
       // create response and determine if it will be an responseIdentifier
@@ -179,14 +176,25 @@ function _returnResponse(requestParams) {
   return request();
 }
 
-function _internalServerErrorResponse(err) {
+function _internalServerErrorResponse(err, event, secret) {
+
+  // scrub secrets from err message in case they were passed from a thrown err
+  let scrubbed = _scrub(secret, err.message);
+  err.message = scrubbed;
+
+  // set the err code to 500 if it wasn't already set
+  err.code = (err.code ? err.code : 500);
+
+  // log error codes of 500
+  if (err.code == 500) {
+    console.log(Date() + ' error: ' + err);
+    console.log(Date(), 'event data: ' + JSON.stringify(event)); // get event data for later testing
+  }
 
   // create body
   let body = {
-    "Error": {
-      "Error_Code": err.code,
-      "Error_Msg": err.message
-    }
+    'code': err.code,
+    'message': err.message
   };
 
   // set the returnType to text
@@ -289,8 +297,15 @@ function _endpointName(event, endpointBase, endpointData) {
     endpointBase = "";
   }
 
+  if (event.path == null) {
+    let error =  new Error('path not found eventpath: |' + event.path + '| basePath: |/' + endpointBase + '/|');
+    error.code = 404;
+    throw error;
+  }
+
   // add apiName to event.path if it doesn't exist (AWS doesn't include, sam client does)
   let apiName = endpointBase.split('/')[0];
+
   if (event.path.includes(apiName) == false) event.path = '/' + apiName + event.path;
 
   // attempt to find name requestHandler endpoint and make sure it is the correct method
@@ -298,7 +313,7 @@ function _endpointName(event, endpointBase, endpointData) {
     let endpoint = endpointData[index];
     let requestPath = '/' + endpointBase + '/' + endpoint.name;
     if (requestPath == event.path) {
-      if (event.httpMethod == endpoint.method) return endpoint.name;
+      for (var index in endpoint.methods) if (event.httpMethod == endpoint.methods[index]) return endpoint.name;
       let error =  new Error('|' + event.httpMethod + '| method not available for |' + endpoint.name + '|');
       error.code = 400;
       throw error;
@@ -321,9 +336,28 @@ function _convertJSONToParameters(json, conversionType) {
 function _scrub(secret, string) {
   for (var key in secret) {
     var value = secret[key];
-    if (typeof value == 'string') {
+    if (typeof value == 'string' && value != 'undefined') {
       string = string.replace(value, 'SECRET');
     }
   }
   return string;
+}
+
+function _convertToJSON(potentialJSON) {
+
+  if (potentialJSON == null) return {};
+
+  if (typeof potentialJSON == 'string') {
+    try {
+      json = JSON.parse(potentialJSON);
+      return json;
+    }
+    catch(err) {
+      let error = new Error('delivered JSON is not parsable');
+      error.code = 400;
+      throw error;
+    }
+  }
+
+  return potentialJSON;
 }
