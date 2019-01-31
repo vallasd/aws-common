@@ -179,8 +179,10 @@ function _returnResponse(requestParams) {
 function _internalServerErrorResponse(err, event, secret) {
 
   // scrub secrets from err message in case they were passed from a thrown err
-  let scrubbed = _scrub(secret, err.message);
-  err.message = scrubbed;
+  if (secret != null) {
+    let scrubbed = _scrub(secret, err.message);
+    err.message = scrubbed;
+  }
 
   // set the err code to 500 if it wasn't already set
   err.code = (err.code ? err.code : 500);

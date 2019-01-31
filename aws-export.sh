@@ -86,7 +86,7 @@ do
     fi
 
     # install package
-    npm install
+    npm install --only=production
 
     # add node_modules to lambda list
     find node_modules >> lambda.list
