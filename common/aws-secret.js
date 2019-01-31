@@ -28,10 +28,10 @@ const aws = require('aws-sdk');
 const debug = (process.env.debug === 'true');
 
 // assign aws endpoint and region
-const endpoint = 'https://secretsmanager.us-east-1.amazonaws.com';
 const region = 'us-east-1';
+const endpoint = 'https://secretsmanager.us-east-1.amazonaws.com';
 
-// Load the config file if debug is simulator (we don't include this file in production)
+// load the config file if debug is simulator (we don't include this file in production)
 if (fs.existsSync('./aws-config.json')) aws.config.loadFromPath('./aws-config.json');
 
 // Create a Secrets Manager client
@@ -41,7 +41,7 @@ const client = new aws.SecretsManager({
 });
 
 // returns a promise to get the secret for a specific secretId in AWS
-function getSecret(secretId) {
+function get(secretId) {
   // create promise to retrieve secret
   const promise = new Promise(((resolve) => {
     const params = { SecretId: secretId };
@@ -84,22 +84,24 @@ function getSecret(secretId) {
   return promise;
 }
 
-// returns a promise to store the secret for a specific secretId in AWS.  Logs error if storage fails.
-function storeSecret(secretId, secretString) {
-
-  let promise = new Promise(function(resolve, reject) {
-    let params = { SecretId: secretId, SecretString: secretString };
-    client.putSecretValue(params, function(err, data) {
-      if (err) console.log('ERROR: secret storage: ' + err);
+// returns a promise to store the secret for a specific secretId in AWS.
+// Logs error if storage fails.
+function store(secretId, secretString) {
+  const promise = new Promise(((resolve) => {
+    const params = { SecretId: secretId, SecretString: secretString };
+    client.putSecretValue(params, (err) => {
+      if (err) console.log(`ERROR: secret storage: ${err}`);
       resolve();
     });
-  });
+  }));
+
+  return promise;
 }
 
 module.exports = {
   // returns a promise to get the secret for a specific secretId in AWS
-  secret(secretId) { return getSecret(secretId); },
+  get(secretId) { return get(secretId); },
 
   // returns a promise to store the secret for a specific secretId in AWS
-  storeSecret(secretId, secretString) { return storeSecret(secretId, secretString); },
-}
+  store(secretId, secretString) { return store(secretId, secretString); },
+};
