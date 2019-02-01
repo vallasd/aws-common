@@ -19,10 +19,7 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// we have unresolved files that will be add when combined with other libraries
-/* eslint import/no-unresolved: 2 */
-
-const fetch = require('node-fetch');
+const fetch = require('node-fetch'); // eslint-disable-line import/no-unresolved
 
 const debug = (process.env.debug === 'true');
 
@@ -58,6 +55,9 @@ function createURL(baseURL, parameters) {
   // returns null if we dont have a baseURL
   if (baseURL == null) return null;
 
+  // if parameters is null just return the baseurl
+  if (parameters == null) return baseURL;
+
   // return concatenated string of just orderedParameters that have values
   let fullurl = `${baseURL}?`;
   Object.keys(parameters).forEach((key) => {
@@ -73,7 +73,7 @@ function createURL(baseURL, parameters) {
   return fullurl;
 }
 
-function returnResponse(requestParams) {
+function urlRequest(requestParams) {
   // create async request
   const request = async () => {
     try {
@@ -87,7 +87,7 @@ function returnResponse(requestParams) {
       const url = createURL(rp.url, rp.parameters);
 
       // create a timeout of seven seconds if no timeout supplied
-      const timeout = (requestParams.timeout ? requestParams.timeout : 7000);
+      const timeout = (rp.timeout ? rp.timeout : 7000);
       rp.timeout = timeout;
 
       // create headers and Content-Type header based on returnType in requestParams
@@ -97,7 +97,7 @@ function returnResponse(requestParams) {
       // display debug
       if (debug) console.log(Date(), `returnResponse |${rp.requestName}| url: |${url}|`);
       if (debug) console.log(Date(), `returnResponse |${rp.requestName}| params: |${JSON.stringify(rp)}|`);
-
+      console.log('HERED');
       // remove parameters not needed for fetch
       delete rp.url;
       delete rp.requestName;
@@ -105,7 +105,7 @@ function returnResponse(requestParams) {
 
       // fetch the request and save as result
       const result = await fetch(url, rp);
-
+      console.log('HEREE');
       // log the content-type
       if (debug) console.log(Date(), `returnResponse |${rp.requestName}| Content-Type: |${result.headers.get('Content-Type')}|`);
 
@@ -158,8 +158,7 @@ function internalServerErrorResponse(error, event, secret) {
 
   // scrub secrets from err message in case they were passed from a thrown err
   if (secret != null) {
-    const scrubbed = scrub(secret, error.message);
-    err.message = scrubbed;
+    err.message = scrub(secret, error.message);
   }
 
   // set the err code to 500 if it wasn't already set
@@ -177,13 +176,13 @@ function internalServerErrorResponse(error, event, secret) {
     message: err.message,
   };
 
-  // create headers for the error response
-  let headers = {};
-  headers = updateContentTypeHeader(headers, returnType);
+  // create headers with content-type json
+  const headers = updateContentTypeHeader({}, returnType.json);
 
+  // return lambda response
   return {
     headers,
-    body,
+    body: JSON.stringify(body),
     statusCode: err.code,
   };
 }
@@ -262,20 +261,23 @@ function endpointName(event, endpointBase, endpointData) {
   if (ep.includes(apiName) === false) ep = `/${apiName}${ep}`;
 
   // attempt to find name requestHandler endpoint and make sure it is the correct method
-  Object.keys(endpointData).forEach((i1) => {
+  for (let i1 in endpointData) { // eslint-disable-line
     const endpoint = endpointData[i1];
     const requestPath = `/${epb}/${endpoint.name}`;
     if (requestPath === ep) {
-      Object.keys(endpoint.methods).forEach((i2) => { // eslint-disable-line consistent-return
+      // determine if method exists for endpoint
+      for (let i2 in endpoint.methods) { // eslint-disable-line
         if (event.httpMethod === endpoint.methods[i2]) {
           return endpoint.name;
         }
-      });
+      }
+
+      // throw error
       const error = new Error(`|${event.httpMethod}| method not available for |${endpoint.name}|`);
       error.code = 400;
       throw error;
     }
-  });
+  }
 
   // we didn't find the endpoint, return null
   const error = new Error(`path not found eventpath: |${event.path}| basePath: |/${epb}/|`);
@@ -330,7 +332,7 @@ module.exports = {
   */
 
   // returns promise for the result of a request, formatted for AWS Lambda response
-  returnResponse(requestParams) { return returnResponse(requestParams); },
+  urlRequest(requestParams) { return urlRequest(requestParams); },
 
   // returns an internal Server Error response for a thrown error, formatted for AWS Lambda response
   internalServerErrorResponse(err, event, secret) {

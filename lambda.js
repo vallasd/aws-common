@@ -73,38 +73,47 @@ function loadEnvironment(environment) {
     OR
     { response: { body: , returnType: (type of body), statusCode: number, headers: dictionary } }
 */
-async function processResponse(event, endpoint, response) {
-  // set the currentResponse
-  let currentResponse = response;
+async function processResponse(event, endpoint, previousResponse) {
+  // determine the response
+  let response = {};
 
   try {
-    // get response parameters from handler
-    currentResponse = await requestHandler.response(event, secret, endpoint, response);
-    const { responseIdentifier } = currentResponse;
+    // get action parameters from request handler
+    const actionParameters = await requestHandler.actionParameters(
+      event,
+      secret,
+      endpoint,
+      previousResponse,
+    );
+
+    // get response identifier
+    const ri = actionParameters.responseIdentifier;
 
     // log response
-    if (debug) console.log(Date(), `Processing |${endpoint}| method: |${event.httpMethod}| nextIdentifier: |${responseIdentifier}|`);
+    if (debug) {
+      if (ri) console.log(Date(), `processing identifer: |${ri}|`);
+      else console.log(Date(), `processing |${endpoint}| method: |${event.httpMethod}|`);
+    }
 
-    // process request from requestHandler
-    if (currentResponse.request) {
-      currentResponse = await helper.returnResponse(currentResponse.request);
-      // continue next requestHandler processing step (recursive)
-      if (responseIdentifier) {
-        currentResponse.responseIdentifier = responseIdentifier;
-        if (debug) console.log(Date(), `passing |${endpoint}|`);
-        currentResponse = await processResponse(event, endpoint, currentResponse);
-      }
-    // assign response from requestHandler
-    } else if (currentResponse.response) {
-      delete currentResponse.response.responseIdentifier;
-      currentResponse = currentResponse.response;
-    // we dont know how to process requestHandler data, throw err
+    // process an url request
+    if (actionParameters.request) {
+      response = await helper.urlRequest(actionParameters.request);
+    // process a response
+    } else if (actionParameters.response) {
+      response = actionParameters.response; // eslint-disable-line
+    // we dont know how to process action parameters.  Throw error
     } else {
       throw new Error(`requestHandler for |${endpoint}| did not process`);
     }
+
+    // continue next requestHandler processing step (recursive)
+    if (ri) {
+      response.responseIdentifier = ri;
+      response = await processResponse(event, endpoint, response);
+    }
   } catch (err) { throw err; }
 
-  return currentResponse;
+  return response;
 }
 
 exports.handler = async (event) => {
