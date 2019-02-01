@@ -67,9 +67,6 @@ echo "package.json" >> server.list
 for directory in "${AWS_DIRECTORIES[@]}"
 do
 
-  # skip aws-common directory
-  if [ ${directory} != "aws-common" ]; then
-
     # copy request handler to exports
     cp ../${directory}/requestHandler.js . 2> /dev/null
 
@@ -127,7 +124,6 @@ do
 
     # remove server-package
     rm aws-server-package.json 2> /dev/null
-  fi
 
 done
 

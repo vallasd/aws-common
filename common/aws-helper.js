@@ -97,7 +97,7 @@ function urlRequest(requestParams) {
       // display debug
       if (debug) console.log(Date(), `returnResponse |${rp.requestName}| url: |${url}|`);
       if (debug) console.log(Date(), `returnResponse |${rp.requestName}| params: |${JSON.stringify(rp)}|`);
-      console.log('HERED');
+
       // remove parameters not needed for fetch
       delete rp.url;
       delete rp.requestName;
@@ -105,7 +105,7 @@ function urlRequest(requestParams) {
 
       // fetch the request and save as result
       const result = await fetch(url, rp);
-      console.log('HEREE');
+
       // log the content-type
       if (debug) console.log(Date(), `returnResponse |${rp.requestName}| Content-Type: |${result.headers.get('Content-Type')}|`);
 

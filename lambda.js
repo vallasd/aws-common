@@ -19,9 +19,6 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// we have unresolved files that will be add when combined with other libraries
-/* eslint import/no-unresolved: 2 */
-
 const fs = require('fs');
 const helper = require('./common/aws-helper.js');
 const secretManager = require('./common/aws-secret.js');
@@ -137,8 +134,8 @@ exports.handler = async (event) => {
     if (needsInitialization) {
       // load environment
       if (fs.existsSync('./aws-environment.json')) {
-        if (debug) console.log('loading aws-environment');
-        loadEnvironment(require('./aws-environment.json'));
+        if (debug) console.log(Date(), 'loading aws-environment');
+        loadEnvironment(require('./aws-environment.json')); // eslint-disable-line import/no-unresolved
       }
 
       // load secrets

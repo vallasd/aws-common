@@ -19,10 +19,8 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-/* eslint import/no-unresolved: 2 */
-
 const fs = require('fs');
-const aws = require('aws-sdk');
+const aws = require('aws-sdk'); // eslint-disable-line import/no-unresolved
 
 // set debug
 const debug = (process.env.debug === 'true');
