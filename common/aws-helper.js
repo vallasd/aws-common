@@ -21,6 +21,8 @@
 
 const fetch = require('node-fetch'); // eslint-disable-line import/no-unresolved
 
+const secretManager = require('./aws-secret.js');
+
 const debug = (process.env.debug === 'true');
 
 const returnType = {
@@ -81,7 +83,7 @@ function urlRequest(requestParams) {
       let rp = requestParams;
 
       // if requestParams wasn't passed, we will create a blank dictionary and cleanly fail
-      if (rp === null) rp = {};
+      if (rp == null) rp = {};
 
       // create the full url and make a copy of requestName for error and logs
       const url = createURL(rp.url, rp.parameters);
@@ -95,8 +97,8 @@ function urlRequest(requestParams) {
       let headers = {};
 
       // display debug
-      if (debug) console.log(Date(), `returnResponse |${rp.requestName}| url: |${url}|`);
-      if (debug) console.log(Date(), `returnResponse |${rp.requestName}| params: |${JSON.stringify(rp)}|`);
+      if (debug) console.log(Date(), `process |request| url: |${url}|`);
+      if (debug) console.log(Date(), `process |request| params: |${JSON.stringify(rp)}|`);
 
       // remove parameters not needed for fetch
       delete rp.url;
@@ -107,13 +109,13 @@ function urlRequest(requestParams) {
       const result = await fetch(url, rp);
 
       // log the content-type
-      if (debug) console.log(Date(), `returnResponse |${rp.requestName}| Content-Type: |${result.headers.get('Content-Type')}|`);
+      if (debug) console.log(Date(), `process |request| Content-Type: |${result.headers.get('Content-Type')}|`);
 
       // determine the returnType from content-type (if no content-type, uses json)
       const rt = returnTypeForContentType(result.headers.get('Content-Type'));
 
       // log the returnType
-      if (debug) console.log(Date(), `returnResponse |${rp.requestName}| returning: ${rt}`);
+      if (debug) console.log(Date(), `process |request| returning: ${rt}`);
 
       // update headers content-type with returnType
       headers = updateContentTypeHeader(headers, rt);
@@ -125,7 +127,7 @@ function urlRequest(requestParams) {
       } else if (rt === returnType.text || rt === returnType.xml || rt === returnType.html) {
         body = await result.text();
       } else {
-        throw new Error(`|${rp.requestName}| unable to parse returnType |${rt}|`);
+        throw new Error(`process |request| unable to parse returnType |${rt}|`);
       }
 
       // return a lambda response
@@ -133,6 +135,27 @@ function urlRequest(requestParams) {
         headers,
         body,
         statusCode: result.status,
+      };
+    } catch (error) { throw error; }
+  };
+
+  return request();
+}
+
+function processSecret(secretParams, secretId) {
+  // create async request
+  const request = async () => {
+    try {
+      let s = {};
+      if (secretParams.method === 'GET') s = await secretManager.get(secretId);
+      if (secretParams.method === 'POST') s = await secretManager.store(secretId, secretParams.secret);
+      if (s == null || s === {}) throw new Error('process |secret| unable to retrieve secret');
+
+      // return a lambda response
+      return {
+        headers: { 'Content-Type': 'text/json' },
+        body: s,
+        statusCode: 200,
       };
     } catch (error) { throw error; }
   };
@@ -188,7 +211,7 @@ function internalServerErrorResponse(error, event, secret) {
 }
 
 function convertBodyData(bodyData) {
-  if (bodyData === [] || bodyData === null) return null; // return null for empty bodies
+  if (bodyData === [] || bodyData == null) return null; // return null for empty bodies
   let string = null;
 
   try {
@@ -326,13 +349,19 @@ module.exports = {
       size: 0,                  maximum response body size in bytes. 0 to disable
       agent: null               http(s).Agent instance, allows custom proxy, certificate,
                                 lookup, family etc.
-
-      *Used when creating the response
-      requestName: string,      used for logging
   */
 
   // returns promise for the result of a request, formatted for AWS Lambda response
   urlRequest(requestParams) { return urlRequest(requestParams); },
+
+  /*
+    secretParams
+    secret:   only required for a POST method
+    method:   GET or POST
+  */
+
+  // stores or retrieves secret, formatted for AWS Lambda response
+  processSecret(secretParams, secretId) { return processSecret(secretParams, secretId); },
 
   // returns an internal Server Error response for a thrown error, formatted for AWS Lambda response
   internalServerErrorResponse(err, event, secret) {

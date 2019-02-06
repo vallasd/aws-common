@@ -22,7 +22,7 @@
 const fs = require('fs');
 const helper = require('./common/aws-helper.js');
 const secretManager = require('./common/aws-secret.js');
-const requestHandler = require('./requestHandler.js');
+const actionHandler = require('./actionHandler.js');
 
 const debug = (process.env.debug === 'true');
 
@@ -76,36 +76,38 @@ async function processResponse(event, endpoint, previousResponse) {
 
   try {
     // get action parameters from request handler
-    const actionParameters = await requestHandler.actionParameters(
+    const action = await actionHandler.action(
       event,
       secret,
       endpoint,
       previousResponse,
     );
 
-    // get response identifier
-    const ri = actionParameters.responseIdentifier;
-
-    // log response
-    if (debug) {
-      if (ri) console.log(Date(), `processing identifer: |${ri}|`);
-      else console.log(Date(), `processing |${endpoint}| method: |${event.httpMethod}|`);
-    }
+    // log process
+    if (debug && previousResponse == null) console.log(Date(), `processing |${endpoint}| method: |${event.httpMethod}|`);
 
     // process an url request
-    if (actionParameters.request) {
-      response = await helper.urlRequest(actionParameters.request);
+    if (action.request) {
+      response = await helper.urlRequest(action.request);
     // process a response
-    } else if (actionParameters.response) {
-      response = actionParameters.response; // eslint-disable-line
-    // we dont know how to process action parameters.  Throw error
+    } else if (action.response) {
+      response = action.response; // eslint-disable-line
+    // process a secret
+    } else if (action.secret) {
+      response = helper.processSecret(action.secret, action.secretId());
+      // update local secret variable if we successfully posted a secret
+      if (action.secret.method === 'POST' && response.statusCode === 200) {
+        secret = action.secret; // eslint-disable-line
+      }
+    // we dont know how to process action.  Throw error
     } else {
-      throw new Error(`requestHandler for |${endpoint}| did not process`);
+      throw new Error(`|${endpoint}| failed to process`);
     }
 
     // continue next requestHandler processing step (recursive)
-    if (ri) {
-      response.responseIdentifier = ri;
+    if (action.nextAction) {
+      if (debug) console.log(Date(), `processing next action: |${action.nextAction}|`);
+      response.nextAction = action.nextAction;
       response = await processResponse(event, endpoint, response);
     }
   } catch (err) { throw err; }
@@ -125,9 +127,7 @@ exports.handler = async (event) => {
   }
 
   // define a response that is returned if we don't process one
-  const error = new Error('response not processed');
-  error.code = 501;
-  let response = helper.internalServerErrorResponse(error, event);
+  let response = null;
 
   try {
     // check if the lambda needs initialization
@@ -139,15 +139,15 @@ exports.handler = async (event) => {
       }
 
       // load secrets
-      if (requestHandler.hasSecret) {
-        secret = await secretManager.secret(requestHandler.secretPath());
+      if (actionHandler.hasSecret) {
+        secret = await secretManager.get(actionHandler.secretId());
       }
     }
 
     // get endpoint based off of requestHandler supplied endpointData
     const endpoint = helper.endpointName(processedEvent,
-      requestHandler.basePath(),
-      requestHandler.endpointData);
+      actionHandler.basePath(),
+      actionHandler.endpointData);
 
     // process the request to get the response
     response = await processResponse(processedEvent, endpoint);
@@ -155,13 +155,21 @@ exports.handler = async (event) => {
     // determine if intialization is needed during next call
     setInitialization();
 
-    // convert json to string
+    // convert json to string, TODO: make checking more robust
     if (typeof response.body === 'object') {
       if (debug) console.log(Date(), 'converting JSON body to string');
       response.body = JSON.stringify(response.body);
     }
+
+    // check if response is valid, if not throw error
+    if (response == null
+      || response.body == null
+      || response.headers == null
+      || response.statusCode == null) {
+      throw new Error('response not processed properly');
+    }
   } catch (err) {
-    // create an error response
+    // create a valid error response
     response = helper.internalServerErrorResponse(err, processedEvent, secret);
   }
 

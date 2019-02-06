@@ -66,12 +66,10 @@ function testXML() {
 }
 
 function testResponseIdentifier1(previousResponse) {
-  console.log(`previousResponse: ${previousResponse}`);
   if (previousResponse == null) {
     return {
       responseIdentifier: 1,
       request: {
-        requestName: 'testResponseIdentifier1',
         url: 'https://reqres.in/api/users/2',
       },
     };
@@ -94,10 +92,8 @@ function testResponseIdentifier1(previousResponse) {
 }
 
 function testResponseIdentifier2(previousResponse) {
-  console.log(`previousResponse: ${previousResponse}`);
-  console.log('TEST1');
   // return first response
-  if (previousResponse === null || previousResponse === undefined) {
+  if (previousResponse == null) {
     return {
       responseIdentifier: 1,
       response: {
@@ -109,7 +105,6 @@ function testResponseIdentifier2(previousResponse) {
   }
 
   // return second response
-  console.log('TEST2');
   if (previousResponse.responseIdentifier === 1) {
     return {
       responseIdentifier: 2,
@@ -122,7 +117,6 @@ function testResponseIdentifier2(previousResponse) {
   }
 
   // return third response (final response should be returned)
-  console.log('TEST3');
   if (previousResponse.responseIdentifier === 2) {
     return {
       response: {
@@ -133,7 +127,6 @@ function testResponseIdentifier2(previousResponse) {
     };
   }
 
-  console.log('TEST4');
   return {
     responseIdentifier: 2,
     response: {
@@ -144,11 +137,50 @@ function testResponseIdentifier2(previousResponse) {
   };
 }
 
+function testSecret1(secret) {
+  console.log(`secret is: ${JSON.stringify(secret)}`);
+  let message = 'Test Passed';
+  let code = 200;
+  if (secret.isEmpty()) {
+    message = 'Test Failed';
+    code = 500;
+  }
+
+  return {
+    response: {
+      headers: { 'Content-Type': 'text/plain' },
+      body: message,
+      statusCode: code,
+    },
+  };
+}
+
+function testSecret2(event) {
+  if (event.httpMethod === 'GET') {
+    return {
+      secret: {
+        method: 'GET',
+      },
+    };
+  }
+  if (event.httpMethod === 'POST') {
+    return {
+      secret: {
+        secretString: event.body,
+        method: 'POST',
+      },
+    };
+  }
+
+  // should not get here
+  return null;
+}
+
 module.exports = {
 
-  hasSecret: false,
+  hasSecret: true,
 
-  secretPath() {
+  secretId() {
     return `${p.apiName}/${p.environment}`;
   },
 
@@ -163,15 +195,20 @@ module.exports = {
     { name: 'testXML', methods: ['GET'] },
     { name: 'testResponseIdentifier1', methods: ['GET'] },
     { name: 'testResponseIdentifier2', methods: ['GET'] },
+    { name: 'testSecret1', methods: ['GET'] },
+    { name: 'testSecret2', methods: ['GET'] },
+    { name: 'testSecret2', methods: ['POST'] },
   ],
 
-  actionParameters(event, secret, endpoint, previousResponse) {
+  action(event, secret, endpoint, previousResponse) {
     if (endpoint === 'testText') return testText();
     if (endpoint === 'testJSON') return testJSON();
     if (endpoint === 'testHTML') return testHTML();
     if (endpoint === 'testXML') return testXML();
     if (endpoint === 'testResponseIdentifier1') return testResponseIdentifier1(previousResponse);
     if (endpoint === 'testResponseIdentifier2') return testResponseIdentifier2(previousResponse);
+    if (endpoint === 'testSecret1') return testSecret1(secret);
+    if (endpoint === 'testSecret2') return testSecret2(event);
 
     // we should never get here
     const err = `|${endpoint}| endpoint unknown`;

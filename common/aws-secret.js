@@ -88,8 +88,12 @@ function store(secretId, secretString) {
   const promise = new Promise(((resolve) => {
     const params = { SecretId: secretId, SecretString: secretString };
     client.putSecretValue(params, (err) => {
-      if (err) console.log(`ERROR: secret storage: ${err}`);
-      resolve();
+      if (err) {
+        console.log(`ERROR: secret storage: ${err}`);
+        resolve({});
+        return;
+      }
+      resolve(JSON.parse(secretString));
     });
   }));
 
