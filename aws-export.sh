@@ -23,20 +23,35 @@
 
 #!/bin/bash
 
+# check if we aren't making export files
+
+# create exports directory
+
+while getopts "o:" opt; do
+  case $opt in
+    o) OPTION=$OPTARG;;
+    *) exit 1
+  esac
+done
+
 # create exports directory
 
 if [ -d ../exports ]; then
-  rm -R ../exports/* 2> /dev/null
+  if [[ ${OPTION} != 'nozip' ]]; then
+    rm -R ../exports/* 2> /dev/null
+  fi
 else
-  mkdir ../exports
+  mkdir ../exports 2> /dev/null
 fi
 
-# create exports directory
+# create samcli directory and copy yaml
 
 if [ ! -d ../samcli ]; then
   mkdir ../samcli
+  if [[ ${OPTION} != 'nozip' ]]; then
+    cp ./template.yaml ../samcli/. 2> /dev/null
+  fi
 fi
-
 
 # create variables for current directory and aws directories
 
@@ -49,26 +64,38 @@ cd exports
 cp -R ${COMMONDIR}/common . 2> /dev/null
 cp ${COMMONDIR}/lambda.js . 2> /dev/null
 cp ${COMMONDIR}/app.js . 2> /dev/null
-cp ${COMMONDIR}/requestHandler.js . 2> /dev/null
 
-# create lambda zip list
-find common > lambda.list
-echo "requestHandler.js" >> lambda.list
-echo "lambda.js" >> lambda.list
 
-# create server zip list
-find common > server.list
-echo "requestHandler.js" >> server.list
-echo "lambda.js" >> server.list
-echo "app.js" >> server.list
-echo "package.json" >> server.list
 
 # iterate AWS_DIRECTORIES and create AWS lambda and server zip files
 for directory in "${AWS_DIRECTORIES[@]}"
 do
 
-    # copy request handler to exports
-    cp ../${directory}/requestHandler.js . 2> /dev/null
+  # copy request handler to exports
+  cp ../${directory}/actionHandler.js . 2> /dev/null
+  cp ../${directory}/actionCommon.js . 2> /dev/null
+  cp -R ../${directory}/actions . 2> /dev/null
+  cp -R ../${directory}/documents . 2> /dev/null
+
+  # create lambda zip list
+  find common > lambda.list
+  find actions >> lambda.list
+  find documents >> lambda.list
+  echo "actionHandler.js" >> lambda.list
+  echo "actionCommon.js" >> lambda.list
+  echo "lambda.js" >> lambda.list
+
+  # create server zip list
+  find common > server.list
+  find actions >> server.list
+  find documents >> server.list
+  echo "actionHandler.js" >> server.list
+  echo "actionCommon.js" >> server.list
+  echo "lambda.js" >> server.list
+  echo "app.js" >> server.list
+  echo "package.json" >> server.list
+
+  if [[ ${OPTION} != 'nozip' ]]; then
 
     # copy lambda common package
     cp ${COMMONDIR}/aws-lambda-package.json .  2> /dev/null
@@ -91,21 +118,32 @@ do
     # create a zip file for lambda
     cat lambda.list | zip -@ aws-lambda-${directory}.zip > /dev/null
 
-    # create samcli folder
+    # create sam cli directory with node modules
     rm -R ../samcli/${directory} 2> /dev/null
     mkdir ../samcli/${directory} 2> /dev/null
-    cp -R ./common ../samcli/${directory}/. 2> /dev/null
     cp -R ./node_modules ../samcli/${directory}/. 2> /dev/null
-    cp ./lambda.js ../samcli/${directory}/. 2> /dev/null
-    cp ./requestHandler.js ../samcli/${directory}/. 2> /dev/null
-    cp ./package.json ../samcli/${directory}/. 2> /dev/null
-    cp ./package-lock.json ../samcli/${directory}/. 2> /dev/null
-    cp ${COMMONDIR}/aws-config.json ../samcli/${directory}/. 2> /dev/null
+  fi
 
-    # remove lambda-package
-    rm aws-lambda-package.json 2> /dev/null
-    rm package-lock.json 2> /dev/null
-    rm -R node_modules 2> /dev/null
+  # create samcli (if necessary) and copy files
+  mkdir ../samcli/${directory} 2> /dev/null
+  cp -R ./common ../samcli/${directory}/. 2> /dev/null
+  rm -R ../samcli/${directory}/actions 2> /dev/null
+  rm -R ../samcli/${directory}/documents 2> /dev/null
+  cp -R ./actions ../samcli/${directory}/. 2> /dev/null
+  cp -R ./documents ../samcli/${directory}/. 2> /dev/null
+  cp ./lambda.js ../samcli/${directory}/. 2> /dev/null
+  cp ./actionHandler.js ../samcli/${directory}/. 2> /dev/null
+  cp ./actionCommon.js ../samcli/${directory}/. 2> /dev/null
+  cp ./package.json ../samcli/${directory}/. 2> /dev/null
+  cp ./package-lock.json ../samcli/${directory}/. 2> /dev/null
+  cp ${COMMONDIR}/aws-config.json ../samcli/${directory}/. 2> /dev/null
+
+  # remove lambda-package
+  rm aws-lambda-package.json 2> /dev/null 2> /dev/null
+  rm package-lock.json 2> /dev/null 2> /dev/null
+  rm -R node_modules 2> /dev/null 2> /dev/null
+
+  if [[ ${OPTION} != 'nozip' ]]; then
 
     # copy server-package
     cp ${COMMONDIR}/aws-server-package.json . 2> /dev/null
@@ -125,6 +163,13 @@ do
     # remove server-package
     rm aws-server-package.json 2> /dev/null
 
+  fi
+
+  rm -R actions 2> /dev/null
+  rm -R documents 2> /dev/null
+  rm actionHandler.js 2> /dev/null
+  rm actionCommon.js 2> /dev/null
+
 done
 
 # remove extra files
@@ -133,7 +178,6 @@ rm -R common 2> /dev/null
 rm package.json 2> /dev/null
 rm lambda.js 2> /dev/null
 rm app.js 2> /dev/null
-rm requestHandler.js 2> /dev/null
 rm lambda.list 2> /dev/null
 rm server.list 2> /dev/null
 

@@ -61,7 +61,7 @@ function loadEnvironment(environment) {
 }
 
 /*
-    // Processes the response from the requestHandler
+    // Processes the response from the actionHandler
     REQUEST HANDLER CAN RETURN
     { request: requestParams Dictionary (as outlined by helperMethods.returnResponse) }
     OPTIONAL USED IN ADDITION TO response: (used to let processResponse know that we will
@@ -104,7 +104,7 @@ async function processResponse(event, endpoint, previousResponse) {
       throw new Error(`|${endpoint}| failed to process`);
     }
 
-    // continue next requestHandler processing step (recursive)
+    // continue next actionHandler processing step (recursive)
     if (action.nextAction) {
       if (debug) console.log(Date(), `processing next action: |${action.nextAction}|`);
       response.nextAction = action.nextAction;
@@ -126,6 +126,9 @@ exports.handler = async (event) => {
     processedEvent = require('./aws-event.json');
   }
 
+  // set && event.queryStringParameters to {}
+  if (processedEvent.queryStringParameters == null) processedEvent.queryStringParameters = {};
+
   // define a response that is returned if we don't process one
   let response = null;
 
@@ -144,7 +147,7 @@ exports.handler = async (event) => {
       }
     }
 
-    // get endpoint based off of requestHandler supplied endpointData
+    // get endpoint based off of actionHandler supplied endpointData
     const endpoint = helper.endpointName(processedEvent,
       actionHandler.basePath(),
       actionHandler.endpointData);

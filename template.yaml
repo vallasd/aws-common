@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    sam-app
+    Sample SAM Template for sam-app
+    
+Globals:
+    Function:
+        Timeout: 3
+
+Resources:
+
+    AWSCommonFunction:
+        Type: AWS::Serverless::Function 
+        Properties:
+            CodeUri: aws-common/
+            Handler: lambda.handler
+            Runtime: nodejs8.10
+            Environment: 
+                Variables:
+                    apiName: common
+                    version: v1
+                    environment: QA
+                    debug: 'true'
+            Events:
+                Loyalty:
+                    Type: Api 
+                    Properties:
+                        Path: /common/{proxy+}
+                        Method: any
+
+    NaturalWordFunction:
+        Type: AWS::Serverless::Function 
+        Properties:
+            CodeUri: aws-naturalword/
+            Handler: lambda.handler
+            Runtime: nodejs8.10
+            Environment: 
+                Variables:
+                    apiName: naturalword
+                    version: v1
+                    environment: QA
+                    debug: 'true'
+            Events:
+                Loyalty:
+                    Type: Api 
+                    Properties:
+                        Path: /naturalword/{proxy+}
+                        Method: any
+
+Outputs:
+
+    AWSCommonApi:
+      Description: "API Gateway endpoint URL for Prod stage for AWS Common function"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/common/"
+
+    AWSCommonFunction:
+      Description: "AWS Common Function ARN"
+      Value: !GetAtt AWSCommonFunction.Arn
+
+    AWSCommonIamRole:
+      Description: "Implicit IAM Role created for AWS Common function"
+      Value: !GetAtt AWSCommonFunctionRole.Arn
+
+    NaturalWordApi:
+      Description: "API Gateway endpoint URL for Prod stage for Natural Word function"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/naturalword/"
+
+    NaturalWordFunction:
+      Description: "Natural Word Function ARN"
+      Value: !GetAtt NaturalWordFunction.Arn
+
+    NaturalWordFunctionIamRole:
+      Description: "Implicit IAM Role created for Natural Word function"
+      Value: !GetAtt NaturalWordFunctionRole.Arn

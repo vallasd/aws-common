@@ -19,166 +19,21 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+const actionText = require('./actions/text.js');
+const actionJSON = require('./actions/json.js');
+const actionHTML = require('./actions/html.js');
+const actionXML = require('./actions/xml.js');
+const actionNext1 = require('./actions/next1.js');
+const actionNext2 = require('./actions/next2.js');
+const actionSecretGet = require('./actions/secretGet.js');
+const actionSecretPost = require('./actions/secretPost.js');
+const actionSecretMemory = require('./actions/secretMemory.js');
+
 const p = process.env;
-
-function testText() {
-  return {
-    response: {
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Test Passed',
-      statusCode: 200,
-    },
-  };
-}
-
-function testJSON() {
-  const body = {
-    message: 'Test Passed',
-  };
-
-  return {
-    response: {
-      headers: { 'Content-Type': 'text/json' },
-      body,
-      statusCode: 200,
-    },
-  };
-}
-
-function testHTML() {
-  return {
-    response: {
-      headers: { 'Content-Type': 'text/html' },
-      body: '<html><header><title>Test HTML Call</title></header><body>Test Passed</body></html>',
-      statusCode: 200,
-    },
-  };
-}
-
-function testXML() {
-  return {
-    response: {
-      headers: { 'Content-Type': 'text/xml' },
-      body: '<xml><message>Test Passed</message></xml>',
-      statusCode: 200,
-    },
-  };
-}
-
-function testResponseIdentifier1(previousResponse) {
-  if (previousResponse == null) {
-    return {
-      responseIdentifier: 1,
-      request: {
-        url: 'https://reqres.in/api/users/2',
-      },
-    };
-  }
-
-  let message = 'Test Failed';
-  let code = 500;
-  if (previousResponse.body.data.first_name === 'Janet' && previousResponse.responseIdentifier === 1) {
-    message = 'Test Passed';
-    code = 200;
-  }
-
-  return {
-    response: {
-      headers: { 'Content-Type': 'text/plain' },
-      body: message,
-      statusCode: code,
-    },
-  };
-}
-
-function testResponseIdentifier2(previousResponse) {
-  // return first response
-  if (previousResponse == null) {
-    return {
-      responseIdentifier: 1,
-      response: {
-        headers: { 'Content-Type': 'text/plain' },
-        body: 'Test Failed',
-        statusCode: 500,
-      },
-    };
-  }
-
-  // return second response
-  if (previousResponse.responseIdentifier === 1) {
-    return {
-      responseIdentifier: 2,
-      response: {
-        headers: { 'Content-Type': 'text/plain' },
-        body: 'Test Failed',
-        statusCode: 500,
-      },
-    };
-  }
-
-  // return third response (final response should be returned)
-  if (previousResponse.responseIdentifier === 2) {
-    return {
-      response: {
-        headers: { 'Content-Type': 'text/plain' },
-        body: 'Test Passed',
-        statusCode: 200,
-      },
-    };
-  }
-
-  return {
-    responseIdentifier: 2,
-    response: {
-      headers: { 'Content-Type': 'text/plain' },
-      body: 'Test Failed',
-      statusCode: 500,
-    },
-  };
-}
-
-function testSecret1(secret) {
-  console.log(`secret is: ${JSON.stringify(secret)}`);
-  let message = 'Test Passed';
-  let code = 200;
-  if (secret.isEmpty()) {
-    message = 'Test Failed';
-    code = 500;
-  }
-
-  return {
-    response: {
-      headers: { 'Content-Type': 'text/plain' },
-      body: message,
-      statusCode: code,
-    },
-  };
-}
-
-function testSecret2(event) {
-  if (event.httpMethod === 'GET') {
-    return {
-      secret: {
-        method: 'GET',
-      },
-    };
-  }
-  if (event.httpMethod === 'POST') {
-    return {
-      secret: {
-        secretString: event.body,
-        method: 'POST',
-      },
-    };
-  }
-
-  // should not get here
-  return null;
-}
 
 module.exports = {
 
-  hasSecret: true,
+  hasSecret: false,
 
   secretId() {
     return `${p.apiName}/${p.environment}`;
@@ -189,26 +44,27 @@ module.exports = {
   },
 
   endpointData: [
-    { name: 'testText', methods: ['GET'] },
-    { name: 'testJSON', methods: ['GET'] },
-    { name: 'testHTML', methods: ['GET'] },
-    { name: 'testXML', methods: ['GET'] },
-    { name: 'testResponseIdentifier1', methods: ['GET'] },
-    { name: 'testResponseIdentifier2', methods: ['GET'] },
-    { name: 'testSecret1', methods: ['GET'] },
-    { name: 'testSecret2', methods: ['GET'] },
-    { name: 'testSecret2', methods: ['POST'] },
+    { name: 'text', methods: ['GET'] },
+    { name: 'json', methods: ['GET'] },
+    { name: 'html', methods: ['GET'] },
+    { name: 'xml', methods: ['GET'] },
+    { name: 'next1', methods: ['GET'] },
+    { name: 'next2', methods: ['GET'] },
+    { name: 'secret', methods: ['GET', 'POST'] },
+    { name: 'secretFromMemory', methods: ['GET'] },
+    { name: 'secretFromRegion', methods: ['GET'] },
   ],
 
   action(event, secret, endpoint, previousResponse) {
-    if (endpoint === 'testText') return testText();
-    if (endpoint === 'testJSON') return testJSON();
-    if (endpoint === 'testHTML') return testHTML();
-    if (endpoint === 'testXML') return testXML();
-    if (endpoint === 'testResponseIdentifier1') return testResponseIdentifier1(previousResponse);
-    if (endpoint === 'testResponseIdentifier2') return testResponseIdentifier2(previousResponse);
-    if (endpoint === 'testSecret1') return testSecret1(secret);
-    if (endpoint === 'testSecret2') return testSecret2(event);
+    if (endpoint === 'text') return actionText.action();
+    if (endpoint === 'json') return actionJSON.action();
+    if (endpoint === 'html') return actionHTML.action();
+    if (endpoint === 'xml') return actionXML.action();
+    if (endpoint === 'next1') return actionNext1.action(previousResponse);
+    if (endpoint === 'next2') return actionNext2.action(previousResponse);
+    if (endpoint === 'secret' && event.httpMethod === 'GET') return actionSecretGet.action(event);
+    if (endpoint === 'secret' && event.httpMethod === 'POST') return actionSecretPost.action(event);
+    if (endpoint === 'secretFromMemory') return actionSecretMemory.action(secret);
 
     // we should never get here
     const err = `|${endpoint}| endpoint unknown`;
