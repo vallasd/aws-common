@@ -44,7 +44,7 @@ function serverError(error, event, secret) {
 
   // log error codes of 500
   if (err.code === 500) {
-    console.log(`${Date()} error: ${err}`);
+    console.log(`${Date()} ${err}`);
     console.log(`${Date()} event data: ${JSON.stringify(event)}`); // get event data for later testing
   }
 
@@ -205,6 +205,14 @@ function convertToJSON(potentialJSON) {
   return potentialJSON;
 }
 
+function isEmpty(json) {
+  const j = convertToJSON(json);
+  for (let key in j) { // eslint-disable-line
+    if (json.hasOwnProperty(key)) return false; // eslint-disable-line
+  }
+  return true;
+}
+
 module.exports = {
 
   // scrubs all secrets from a string and replaces them with SECRET text
@@ -227,6 +235,9 @@ module.exports = {
   endpointName(event, endpointBase, endpointData) {
     return endpointName(event, endpointBase, endpointData);
   },
+
+  // checks if JSON is null or empty, throws if json is not an object
+  isEmpty(json) { return isEmpty(json); },
 
   // converts potentialJSON in body to JSON structure.  Throws error if it can not convert.
   convertToJSON(potentialJSON) { return convertToJSON(potentialJSON); },

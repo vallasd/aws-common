@@ -52,7 +52,6 @@ module.exports = {
     { name: 'next2', methods: ['GET'] },
     { name: 'secret', methods: ['GET', 'POST'] },
     { name: 'secretFromMemory', methods: ['GET'] },
-    { name: 'secretFromRegion', methods: ['GET'] },
   ],
 
   action(event, secret, endpoint, previousResponse) {

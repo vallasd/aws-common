@@ -90,7 +90,7 @@ async function processResponse(event, endpoint, previousResponse) {
     // process an the action
     if (action.request) response = await processor.request(action.request);
     else if (action.response) response = action.response; // eslint-disable-line
-    else if (action.secret) response = processor.secret(action.secret, action.secretId());
+    else if (action.secret) response = processor.secret(action.secret);
     else throw new Error(`|${endpoint}| failed to process`);
 
     // continue next actionHandler processing step (recursive)

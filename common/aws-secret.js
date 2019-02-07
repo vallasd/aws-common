@@ -25,31 +25,30 @@ const aws = require('aws-sdk'); // eslint-disable-line import/no-unresolved
 // set debug
 const debug = (process.env.debug === 'true');
 
-// assign aws endpoint and region
-const region = 'us-east-1';
-const endpoint = 'https://secretsmanager.us-east-1.amazonaws.com';
-
 // load the config file if debug is simulator (we don't include this file in production)
 if (fs.existsSync('./aws-config.json')) aws.config.loadFromPath('./aws-config.json');
 
-// Create a Secrets Manager client
-const client = new aws.SecretsManager({
-  endpoint,
-  region,
-});
+// create a Secrets Manager client
+function client(region) {
+  return new aws.SecretsManager({
+    endpoint: `https://secretsmanager.${region}.amazonaws.com`,
+    region,
+  });
+}
 
 // returns a promise to get the secret for a specific secretId in AWS
-function get(secretId) {
+function get(secretId, regionOverride) {
+  const region = (regionOverride || process.env.region || 'us-east-1');
   // create promise to retrieve secret
   const promise = new Promise(((resolve) => {
     const params = { SecretId: secretId };
-    client.getSecretValue(params, (err, data) => {
+    client(region).getSecretValue(params, (err, data) => {
       // initialize secret vars
       let secret = null;
       let binarySecretData = null;
 
       // console log
-      if (debug) console.log(Date(), `retrieving: |${secretId}| from AWS Secret Manager`);
+      if (debug) console.log(Date(), `retrieving |${secretId}| from AWS Secret Manager`);
 
       // attempt to retrieve secret data
       if (err) {
@@ -74,7 +73,7 @@ function get(secretId) {
       }
 
       // no secret found, return empty json, log, and resolve
-      console.log(Date(), `Error: |${secretId}| not retrieved from AWS Secret Manager`);
+      console.log(Date(), `Error: |${secretId}| secret not retrieved from |${region}|`);
       resolve({});
     });
   }));
@@ -84,12 +83,14 @@ function get(secretId) {
 
 // returns a promise to store the secret for a specific secretId in AWS.
 // Logs error if storage fails.
-function store(secretId, secretString) {
+function store(secretId, secretString, regionOverride) {
+  const region = (regionOverride || process.env.region || 'us-east-1');
   const promise = new Promise(((resolve) => {
     const params = { SecretId: secretId, SecretString: secretString };
-    client.putSecretValue(params, (err) => {
+    client(region).putSecretValue(params, (err) => {
       if (err) {
-        console.log(`ERROR: secret storage: ${err}`);
+        console.log(Date(), `Error: secret storage: ${err}`);
+        console.log(Date(), `Error: |${secretId}| secret not stored at |${region}|`);
         resolve({});
         return;
       }
@@ -101,9 +102,12 @@ function store(secretId, secretString) {
 }
 
 module.exports = {
+
   // returns a promise to get the secret for a specific secretId in AWS
-  get(secretId) { return get(secretId); },
+  get(secretId, regionOverride) { return get(secretId, regionOverride); },
 
   // returns a promise to store the secret for a specific secretId in AWS
-  store(secretId, secretString) { return store(secretId, secretString); },
+  store(secretId, secretString, regionOverride) {
+    return store(secretId, secretString, regionOverride);
+  },
 };

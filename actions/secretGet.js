@@ -1,12 +1,15 @@
 exports.action = (event) => { // eslint-disable-line
 
-  if (event.queryStringParameters.region) {
-    process.env.region = event.queryStringParameters.region;
-  }
-
-  return {
+  const param = {
     secret: {
+      secretId: 'common/QA',
       method: 'GET',
     },
   };
+
+  if (event.queryStringParameters.region) {
+    param.secret.region = event.queryStringParameters.region;
+  }
+
+  return param;
 };

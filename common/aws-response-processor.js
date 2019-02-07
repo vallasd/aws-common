@@ -118,14 +118,18 @@ function request(params) {
   return process();
 }
 
-function secret(params, secretId) {
+function secret(params) {
   // create async request
   const process = async () => {
     try {
       let s = {};
-      if (params.method === 'GET') s = await secretManager.get(secretId);
-      if (params.method === 'POST') s = await secretManager.store(secretId, params.secret);
-      if (s == null || s === {}) throw new Error('process |secret| unable to retrieve secret');
+      if (params.method === 'GET') s = await secretManager.get(params.secretId, params.region);
+      if (params.method === 'POST') s = await secretManager.store(params.secretId, params.secret, params.region);
+      if (helper.isEmpty(s)) {
+        if (params.method === 'GET') throw new Error('process |secret| unable to |GET| secret');
+        if (params.method === 'POST') throw new Error('process |secret| unable to |POST| secret');
+        throw new Error('process |secret| unable to |UNDEFINED| secret');
+      }
 
       // return a lambda response
       return {
@@ -168,10 +172,12 @@ module.exports = {
   /*
     secretParams
     secret:   only required for a POST method
+    secretId: required
+    region: us-east-1
     method:   GET or POST
   */
 
   // stores or retrieves secret, formatted for AWS Lambda response
-  secret(params, secretId) { return secret(params, secretId); },
+  secret(params) { return secret(params); },
 
 };
