@@ -22,6 +22,7 @@
 const fs = require('fs');
 const helper = require('./common/aws-helper.js');
 const secretManager = require('./common/aws-secret.js');
+const processor = require('./common/aws-response-processor.js');
 const actionHandler = require('./actionHandler.js');
 
 const debug = (process.env.debug === 'true');
@@ -86,23 +87,11 @@ async function processResponse(event, endpoint, previousResponse) {
     // log process
     if (debug && previousResponse == null) console.log(Date(), `processing |${endpoint}| method: |${event.httpMethod}|`);
 
-    // process an url request
-    if (action.request) {
-      response = await helper.urlRequest(action.request);
-    // process a response
-    } else if (action.response) {
-      response = action.response; // eslint-disable-line
-    // process a secret
-    } else if (action.secret) {
-      response = helper.processSecret(action.secret, action.secretId());
-      // update local secret variable if we successfully posted a secret
-      if (action.secret.method === 'POST' && response.statusCode === 200) {
-        secret = action.secret; // eslint-disable-line
-      }
-    // we dont know how to process action.  Throw error
-    } else {
-      throw new Error(`|${endpoint}| failed to process`);
-    }
+    // process an the action
+    if (action.request) response = await processor.request(action.request);
+    else if (action.response) response = action.response; // eslint-disable-line
+    else if (action.secret) response = processor.secret(action.secret, action.secretId());
+    else throw new Error(`|${endpoint}| failed to process`);
 
     // continue next actionHandler processing step (recursive)
     if (action.nextAction) {
@@ -173,7 +162,7 @@ exports.handler = async (event) => {
     }
   } catch (err) {
     // create a valid error response
-    response = helper.internalServerErrorResponse(err, processedEvent, secret);
+    response = helper.serverError(err, processedEvent, secret);
   }
 
   // return response
