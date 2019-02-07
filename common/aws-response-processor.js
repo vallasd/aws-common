@@ -53,22 +53,22 @@ function updateContentTypeHeader(headers, rt) {
   return newHeaders;
 }
 
-function request(requestParams) {
+function request(params) {
   // create async request
   const process = async () => {
     try {
       // set initial variables
-      let rp = requestParams;
+      let p = params;
 
       // if requestParams wasn't passed, we will create a blank dictionary and cleanly fail
-      if (rp == null) rp = {};
+      if (p == null) p = {};
 
       // create the full url and make a copy of requestName for error and logs
-      const url = helper.createURL(rp.url, rp.parameters);
+      const url = helper.createURL(p.url, p.parameters);
 
       // create a timeout of seven seconds if no timeout supplied
-      const timeout = (rp.timeout ? rp.timeout : 7000);
-      rp.timeout = timeout;
+      const timeout = (p.timeout ? p.timeout : 7000);
+      p.timeout = timeout;
 
       // create headers and Content-Type header based on returnType in requestParams
       // (default will be json)
@@ -76,15 +76,15 @@ function request(requestParams) {
 
       // display debug
       if (debug) console.log(Date(), `process |request| url: |${url}|`);
-      if (debug) console.log(Date(), `process |request| params: |${JSON.stringify(rp)}|`);
+      if (debug) console.log(Date(), `process |request| params: |${JSON.stringify(p)}|`);
 
       // remove parameters not needed for fetch
-      delete rp.url;
-      delete rp.requestName;
-      delete rp.parameters;
+      delete p.url;
+      delete p.requestName;
+      delete p.parameters;
 
       // fetch the request and save as result
-      const result = await fetch(url, rp);
+      const result = await fetch(url, p);
 
       // log the content-type
       if (debug) console.log(Date(), `process |request| Content-Type: |${result.headers.get('Content-Type')}|`);
@@ -118,13 +118,13 @@ function request(requestParams) {
   return process();
 }
 
-function secret(secretParams, secretId) {
+function secret(params, secretId) {
   // create async request
   const process = async () => {
     try {
       let s = {};
-      if (secretParams.method === 'GET') s = await secretManager.get(secretId);
-      if (secretParams.method === 'POST') s = await secretManager.store(secretId, secretParams.secret);
+      if (params.method === 'GET') s = await secretManager.get(secretId);
+      if (params.method === 'POST') s = await secretManager.store(secretId, params.secret);
       if (s == null || s === {}) throw new Error('process |secret| unable to retrieve secret');
 
       // return a lambda response
@@ -163,7 +163,7 @@ module.exports = {
   */
 
   // returns promise for the result of a request, formatted for AWS Lambda response
-  request(requestParams) { return request(requestParams); },
+  request(params) { return request(params); },
 
   /*
     secretParams
@@ -172,6 +172,6 @@ module.exports = {
   */
 
   // stores or retrieves secret, formatted for AWS Lambda response
-  secret(secretParams, secretId) { return secret(secretParams, secretId); },
+  secret(params, secretId) { return secret(params, secretId); },
 
 };
