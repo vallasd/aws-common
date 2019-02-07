@@ -36,9 +36,14 @@ function client(region) {
   });
 }
 
+// determines the region to be used
+function determineRegion(regionOverride) {
+  return (regionOverride || process.env.region || 'us-east-1');
+}
+
 // returns a promise to get the secret for a specific secretId in AWS
 function get(secretId, regionOverride) {
-  const region = (regionOverride || process.env.region || 'us-east-1');
+  const region = determineRegion(regionOverride);
   // create promise to retrieve secret
   const promise = new Promise(((resolve) => {
     const params = { SecretId: secretId };
@@ -84,7 +89,7 @@ function get(secretId, regionOverride) {
 // returns a promise to store the secret for a specific secretId in AWS.
 // Logs error if storage fails.
 function store(secretId, secretString, regionOverride) {
-  const region = (regionOverride || process.env.region || 'us-east-1');
+  const region = determineRegion(regionOverride);
   const promise = new Promise(((resolve) => {
     const params = { SecretId: secretId, SecretString: secretString };
     client(region).putSecretValue(params, (err) => {
