@@ -1,4 +1,4 @@
-exports.action = () => { // eslint-disable-line
+exports.action = () => {
   const body = {
     message: 'Test Passed',
   };

@@ -1,5 +1,4 @@
-exports.action = (event) => { // eslint-disable-line
-
+exports.action = (event) => {
   const param = {
     secret: {
       secretId: 'common/QA',

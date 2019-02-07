@@ -1,7 +1,7 @@
-exports.action = (previousResponse) => { // eslint-disable-line
+exports.action = (previousResponse) => {
   if (previousResponse == null) {
     return {
-      responseIdentifier: 1,
+      nextAction: 1,
       request: {
         url: 'https://reqres.in/api/users/2',
       },

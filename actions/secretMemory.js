@@ -1,9 +1,7 @@
-exports.action = (secret) => { // eslint-disable-line
-  return {
-    response: {
-      headers: { 'Content-Type': 'text/plain' },
-      body: secret,
-      statusCode: 200,
-    },
-  };
-};
+exports.action = secret => ({
+  response: {
+    headers: { 'Content-Type': 'text/json' },
+    body: secret,
+    statusCode: 200,
+  },
+});

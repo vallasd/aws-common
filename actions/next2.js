@@ -1,7 +1,7 @@
-exports.action = (previousResponse) => { // eslint-disable-line
+exports.action = (previousResponse) => {
   if (previousResponse == null) {
     return {
-      responseIdentifier: 1,
+      nextAction: 1,
       response: {
         headers: { 'Content-Type': 'text/plain' },
         body: 'Test Failed',
@@ -11,9 +11,9 @@ exports.action = (previousResponse) => { // eslint-disable-line
   }
 
   // return second response
-  if (previousResponse.responseIdentifier === 1) {
+  if (previousResponse.nextAction === 1) {
     return {
-      responseIdentifier: 2,
+      nextAction: 2,
       response: {
         headers: { 'Content-Type': 'text/plain' },
         body: 'Test Failed',
@@ -23,7 +23,7 @@ exports.action = (previousResponse) => { // eslint-disable-line
   }
 
   // return third response (final response should be returned)
-  if (previousResponse.responseIdentifier === 2) {
+  if (previousResponse.nextAction === 2) {
     return {
       response: {
         headers: { 'Content-Type': 'text/plain' },
@@ -34,7 +34,6 @@ exports.action = (previousResponse) => { // eslint-disable-line
   }
 
   return {
-    responseIdentifier: 2,
     response: {
       headers: { 'Content-Type': 'text/plain' },
       body: 'Test Failed',

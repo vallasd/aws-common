@@ -33,7 +33,7 @@ const p = process.env;
 
 module.exports = {
 
-  hasSecret: false,
+  hasSecret: true,
 
   secretId() {
     return `${p.apiName}/${p.environment}`;

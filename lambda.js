@@ -77,7 +77,7 @@ async function processResponse(event, endpoint, previousResponse) {
 
   try {
     // get action parameters from request handler
-    const action = await actionHandler.action(
+    const action = actionHandler.action(
       event,
       secret,
       endpoint,
@@ -90,7 +90,7 @@ async function processResponse(event, endpoint, previousResponse) {
     // process an the action
     if (action.request) response = await processor.request(action.request);
     else if (action.response) response = action.response; // eslint-disable-line
-    else if (action.secret) response = processor.secret(action.secret);
+    else if (action.secret) response = await processor.secret(action.secret);
     else throw new Error(`|${endpoint}| failed to process`);
 
     // continue next actionHandler processing step (recursive)
