@@ -1,10 +1,39 @@
-// aws-helper.js (helper class to create requests and save data)
+// aws-helper.js (helper class with generic functions used throughout code)
 // aws-common
 //
 // Created by David Vallas. (david_vallas@yahoo.com) (dcvallas@twitter)
 // Copyright © 2019 Fenix Labs.
 //
 // All Rights Reserved.
+
+const docType = {
+  text: 'text',
+  html: 'html',
+  xml: 'xml',
+  json: 'json',
+};
+
+function docTypeForHeaders(headers) {
+  const ct = headers.get('Content-Type');
+  const c = ct.split(';')[0];
+  if (c === 'application/json') return docType.json;
+  if (c === 'text/json') return docType.json;
+  if (c === 'application/xml') return docType.xml;
+  if (c === 'text/xml') return docType.xml;
+  if (c === 'text/plain') return docType.text;
+  if (c === 'text/html') return docType.html;
+  return docType.json;
+}
+
+function updateContentTypeHeader(headers, doctype) {
+  const newHeaders = headers;
+  if (doctype === 'text') newHeaders['Content-Type'] = 'text/plain';
+  else if (doctype === 'json') newHeaders['Content-Type'] = 'text/json';
+  else if (doctype === 'html') newHeaders['Content-Type'] = 'text/html';
+  else if (doctype === 'xml') newHeaders['Content-Type'] = 'text/xml';
+  else throw new Error(`doctype |${doctype}| not recognized`);
+  return newHeaders;
+}
 
 function scrub(secret, string) {
   let scrubbed = string;
@@ -201,6 +230,15 @@ function isEmpty(json) {
 }
 
 module.exports = {
+
+  // different types of docs used in aws-common
+  docType: { docType },
+
+  // determines the appropriate docType given headers
+  docTypeForHeaders(headers) { return docTypeForHeaders(headers); },
+
+  // returns new header with the Content-Type set to the associated content-type
+  updateContentTypeHeader(headers, doctype) { return updateContentTypeHeader(headers, doctype); },
 
   // scrubs all secrets from a string and replaces them with SECRET text
   scrub(secret, string) { return scrub(secret, string); },

@@ -12,34 +12,6 @@ const helper = require('./aws-helper.js');
 
 const debug = (process.env.debug === 'true');
 
-const returnType = {
-  text: 'text',
-  html: 'html',
-  xml: 'xml',
-  json: 'json',
-};
-
-function returnTypeForContentType(contentType) {
-  const c = contentType.split(';')[0];
-  if (c === 'application/json') return returnType.json;
-  if (c === 'text/json') return returnType.json;
-  if (c === 'application/xml') return returnType.xml;
-  if (c === 'text/xml') return returnType.xml;
-  if (c === 'text/plain') return returnType.text;
-  if (c === 'text/html') return returnType.html;
-  return returnType.json;
-}
-
-function updateContentTypeHeader(headers, rt) {
-  const newHeaders = headers;
-  if (rt === 'text') newHeaders['Content-Type'] = 'text/plain';
-  else if (rt === 'json') newHeaders['Content-Type'] = 'text/json';
-  else if (rt === 'html') newHeaders['Content-Type'] = 'text/html';
-  else if (rt === 'xml') newHeaders['Content-Type'] = 'text/xml';
-  else throw new Error(`returnType |${returnType}| not recognized`);
-  return newHeaders;
-}
-
 function request(params) {
   // create async request
   const process = async () => {
@@ -57,7 +29,7 @@ function request(params) {
       const timeout = (p.timeout ? p.timeout : 7000);
       p.timeout = timeout;
 
-      // create headers and Content-Type header based on returnType in requestParams
+      // create headers and Content-Type header based on docType in requestParams
       // (default will be json)
       let headers = {};
 
@@ -76,22 +48,23 @@ function request(params) {
       // log the content-type
       if (debug) console.log(Date(), `process |request| Content-Type: |${result.headers.get('Content-Type')}|`);
 
-      // determine the returnType from content-type (if no content-type, uses json)
-      const rt = returnTypeForContentType(result.headers.get('Content-Type'));
+      // determine the doctype from headers
+      const type = helper.docTypeForHeaders(headers);
 
-      // log the returnType
-      if (debug) console.log(Date(), `process |request| returning: ${rt}`);
+      // log the doctype
+      if (debug) console.log(Date(), `process |request| returning: ${type}`);
 
-      // update headers content-type with returnType
-      headers = updateContentTypeHeader(headers, rt);
+      // update headers content-type with docType's Content-Type
+      headers = helper.updateContentTypeHeader(headers, type);
 
       // create return body
       let body = {};
-      if (rt === returnType.json) body = await result.json();
-      else if (rt === returnType.text
-        || rt === returnType.xml
-        || rt === returnType.html) body = await result.text();
-      else throw new Error(`process |request| unable to parse returnType |${rt}|`);
+      const { docType } = helper;
+      if (type === docType.json) body = await result.json();
+      else if (type === docType.text
+        || type === docType.xml
+        || type === docType.html) body = await result.text();
+      else throw new Error(`process |request| unable to parse doctype |${type}|`);
 
       // return a lambda response
       return {
