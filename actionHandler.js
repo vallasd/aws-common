@@ -10,6 +10,10 @@ const actionText = require('./actions/text.js');
 const actionJSON = require('./actions/json.js');
 const actionHTML = require('./actions/html.js');
 const actionXML = require('./actions/xml.js');
+const actionDocText = require('./actions/doc-text.js');
+const actionDocJSON = require('./actions/doc-json.js');
+const actionDocHTML = require('./actions/doc-html.js');
+const actionDocXML = require('./actions/doc-xml.js');
 const actionNext1 = require('./actions/next1.js');
 const actionNext2 = require('./actions/next2.js');
 const actionSecretGet = require('./actions/secretGet.js');
@@ -35,6 +39,10 @@ module.exports = {
     { name: 'json', methods: ['GET'] },
     { name: 'html', methods: ['GET'] },
     { name: 'xml', methods: ['GET'] },
+    { name: 'doc/text', methods: ['GET'] },
+    { name: 'doc/json', methods: ['GET'] },
+    { name: 'doc/html', methods: ['GET'] },
+    { name: 'doc/xml', methods: ['GET'] },
     { name: 'next1', methods: ['GET'] },
     { name: 'next2', methods: ['GET'] },
     { name: 'secret', methods: ['GET', 'POST'] },
@@ -46,6 +54,10 @@ module.exports = {
     if (endpoint === 'json') return actionJSON.action();
     if (endpoint === 'html') return actionHTML.action();
     if (endpoint === 'xml') return actionXML.action();
+    if (endpoint === 'doc/text') return actionDocText.action();
+    if (endpoint === 'doc/json') return actionDocJSON.action();
+    if (endpoint === 'doc/html') return actionDocHTML.action();
+    if (endpoint === 'doc/xml') return actionDocXML.action();
     if (endpoint === 'next1') return actionNext1.action(previousResponse);
     if (endpoint === 'next2') return actionNext2.action(previousResponse);
     if (endpoint === 'secret' && event.httpMethod === 'GET') return actionSecretGet.action(event);
