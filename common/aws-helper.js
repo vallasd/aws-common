@@ -7,10 +7,11 @@
 // All Rights Reserved.
 
 const docType = {
+  json: 'json',
+  jpg: 'jpg',
   text: 'text',
   html: 'html',
   xml: 'xml',
-  json: 'json',
 };
 
 function docTypeForHeaders(headers) {
@@ -18,17 +19,19 @@ function docTypeForHeaders(headers) {
   const c = ct.split(';')[0];
   if (c === 'application/json') return docType.json;
   if (c === 'text/json') return docType.json;
-  if (c === 'application/xml') return docType.xml;
-  if (c === 'text/xml') return docType.xml;
+  if (c === 'image/jpeg') return docType.jpg;
   if (c === 'text/plain') return docType.text;
   if (c === 'text/html') return docType.html;
+  if (c === 'application/xml') return docType.xml;
+  if (c === 'text/xml') return docType.xml;
   return docType.json;
 }
 
 function updateContentTypeHeader(headers, doctype) {
   const newHeaders = headers;
-  if (doctype === 'text') newHeaders['Content-Type'] = 'text/plain';
-  else if (doctype === 'json') newHeaders['Content-Type'] = 'text/json';
+  if (doctype === 'json') newHeaders['Content-Type'] = 'text/plain';
+  else if (doctype === 'jpg') newHeaders['Content-Type'] = 'image/jpeg';
+  else if (doctype === 'text') newHeaders['Content-Type'] = 'text/json';
   else if (doctype === 'html') newHeaders['Content-Type'] = 'text/html';
   else if (doctype === 'xml') newHeaders['Content-Type'] = 'text/xml';
   else throw new Error(`doctype |${doctype}| not recognized`);
@@ -234,7 +237,7 @@ module.exports = {
   // different types of docs used in aws-common
   docType: { docType },
 
-  // determines the appropriate docType given headers
+  // determines the appropriate docType given headers (defaults to JSON)
   docTypeForHeaders(headers) { return docTypeForHeaders(headers); },
 
   // returns new header with the Content-Type set to the associated content-type

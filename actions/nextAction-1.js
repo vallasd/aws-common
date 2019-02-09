@@ -3,14 +3,14 @@ exports.action = (previousResponse) => {
     return {
       nextAction: 1,
       request: {
-        url: 'https://reqres.in/api/users/2',
+        url: 'https://jsonplaceholder.typicode.com/todos/1',
       },
     };
   }
 
   const body = {
     currentAction: previousResponse.nextAction,
-    name: previousResponse.body.data.first_name,
+    name: previousResponse.body.title,
   };
 
   return {
