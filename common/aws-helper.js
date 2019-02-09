@@ -235,7 +235,7 @@ function isEmpty(json) {
 module.exports = {
 
   // different types of docs used in aws-common
-  docType: { docType },
+  docType,
 
   // determines the appropriate docType given headers (defaults to JSON)
   docTypeForHeaders(headers) { return docTypeForHeaders(headers); },

@@ -49,7 +49,7 @@ function request(params) {
       if (debug) console.log(Date(), `process |request| Content-Type: |${result.headers.get('Content-Type')}|`);
 
       // determine the doctype from headers
-      const type = helper.docTypeForHeaders(headers);
+      const type = helper.docTypeForHeaders(result.headers);
 
       // log the doctype
       if (debug) console.log(Date(), `process |request| returning: ${type}`);
@@ -64,7 +64,7 @@ function request(params) {
       else if (type === docType.text
         || type === docType.xml
         || type === docType.html) body = await result.text();
-      else throw new Error(`process |request| unable to parse doctype |${type}|`);
+      else throw new Error(`process |request| unable to parse docType |${type}|`);
 
       // return a lambda response
       return {
