@@ -33,21 +33,10 @@ const actionSecMemory = require('./actions/secret-memory.js');
 const actionSecPost = require('./actions/secret-post.js');
 const actionSmsPost = require('./actions/sms-post.js');
 
-const p = process.env;
-
 module.exports = {
 
-  hasSecret: false,
-
-  dynamoAdmin: true,
-
-  secretId() {
-    return `${p.apiName}/${p.environment}`;
-  },
-
-  basePath() {
-    return `${p.apiName}/${p.version}`;
-  },
+  admin: true,
+  secretInMemory: true,
 
   endpointData: [
     { name: 'document/html', methods: ['GET'] },
@@ -58,7 +47,7 @@ module.exports = {
     { name: 'dynamo', methods: ['DELETE', 'GET', 'POST', 'PUT'] },
     { name: 'dynamo/query', methods: ['GET'] },
     { name: 'nextaction/1', methods: ['GET'] },
-    { name: 'nextaction/1', methods: ['GET'] },
+    { name: 'nextaction/2', methods: ['GET'] },
     { name: 'push', methods: ['POST'] },
     { name: 'request/html', methods: ['GET'] },
     { name: 'request/jpg', methods: ['GET'] },
@@ -103,7 +92,6 @@ module.exports = {
     if (endpoint === 'sms') return actionSmsPost.action(event);
 
     // we should never get here
-    const err = `|${endpoint}| endpoint unknown`;
-    throw new Error(err);
+    throw new Error(`|${endpoint}| endpoint unknown`);
   },
 };

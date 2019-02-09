@@ -8,7 +8,6 @@
 
 const fs = require('fs');
 const helper = require('./common/aws-helper.js');
-const secretManager = require('./common/aws-secret.js');
 const processor = require('./common/aws-response-processor.js');
 const actionHandler = require('./actionHandler.js');
 
@@ -77,7 +76,7 @@ async function processResponse(event, endpoint, previousResponse) {
     // process an the action
     if (action.request) response = await processor.request(action.request);
     else if (action.response) response = action.response; // eslint-disable-line
-    else if (action.secret) response = await processor.secret(action.secret);
+    else if (action.secret) response = await processor.secret(action.secret, actionHandler.admin);
     else throw new Error(`|${endpoint}| failed to process`);
 
     // continue next actionHandler processing step (recursive)
@@ -102,8 +101,9 @@ exports.handler = async (event) => {
     processedEvent = require('./aws-event.json');
   }
 
-  // set && event.queryStringParameters to {}
+  // set && event.queryStringParameters and body to {}
   if (processedEvent.queryStringParameters == null) processedEvent.queryStringParameters = {};
+  if (processedEvent.body == null) processedEvent.body = {};
 
   // define a response that is returned if we don't process one
   let response = null;
@@ -117,15 +117,23 @@ exports.handler = async (event) => {
         loadEnvironment(require('./aws-environment.json')); // eslint-disable-line import/no-unresolved
       }
 
-      // load secrets
-      if (actionHandler.hasSecret) {
-        secret = await secretManager.get(actionHandler.secretId());
+      // load secrets into memory
+      if (actionHandler.secretInMemory) {
+        const secretParams = {
+          secretId: `${process.env.apiName}/${process.env.environment}`,
+          method: 'GET',
+        };
+        const secretResponse = await processor.secret(secretParams);
+        secret = secretResponse.body;
       }
     }
 
+    // set basePath
+    const basePath = `${process.env.apiName}/${process.env.version}`;
+
     // get endpoint based off of actionHandler supplied endpointData
     const endpoint = helper.endpointName(processedEvent,
-      actionHandler.basePath(),
+      basePath,
       actionHandler.endpointData);
 
     // process the request to get the response

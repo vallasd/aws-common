@@ -78,17 +78,22 @@ function request(params) {
   return process();
 }
 
-function secret(params) {
+function secret(params, admin) {
   // create async request
   const process = async () => {
     try {
       let s = {};
       if (params.method === 'GET') s = await secretManager.get(params.secretId, params.region);
-      if (params.method === 'POST') s = await secretManager.store(params.secretId, params.secret, params.region);
+      else if (params.method === 'POST') {
+        if (admin) s = await secretManager.store(params.secretId, params.secret, params.region);
+        else throw new Error('process |secret| unable to |POST| secret |not admin|');
+      }
+
+      // throw error if secret not returned
       if (helper.isEmpty(s)) {
         if (params.method === 'GET') throw new Error('process |secret| unable to |GET| secret');
         if (params.method === 'POST') throw new Error('process |secret| unable to |POST| secret');
-        throw new Error('process |secret| unable to |UNDEFINED| secret');
+        throw new Error(`process |secret| unable to |${params.method}| secret`);
       }
 
       // return a lambda response
@@ -138,6 +143,6 @@ module.exports = {
   */
 
   // stores or retrieves secret, formatted for AWS Lambda response
-  secret(params) { return secret(params); },
+  secret(params, admin) { return secret(params, admin); },
 
 };
