@@ -7,6 +7,7 @@
 // All Rights Reserved.
 
 const fetch = require('node-fetch'); // eslint-disable-line import/no-unresolved
+const fs = require('fs');
 const secretManager = require('./aws-secret.js');
 const helper = require('./aws-helper.js');
 
@@ -64,7 +65,10 @@ function request(params) {
       else if (type === docType.text
         || type === docType.xml
         || type === docType.html) body = await result.text();
-      else throw new Error(`process |request| unable to parse docType |${type}|`);
+      else if (type === docType.jpg) {
+        const dest = fs.createWriteStream('./octocat.png');
+        body = await result.body.pipe(dest);
+      } else throw new Error(`process |request| unable to parse docType |${type}|`);
 
       // return a lambda response
       return {
