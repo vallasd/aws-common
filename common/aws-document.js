@@ -57,11 +57,16 @@ async function get(path, name, extension) {
 
   // attempt to retrieve document from file system
   const filePath = `./${path}/${name}.${extension}`;
-  console.log(Date(), `filepath: |${filePath}| from file`);
   if (fs.existsSync(filePath)) {
     // get document from file system
     const doc = await read(filePath, extension);
+
     // save document to memory
+    if (!docPath) documents[path] = {};
+    const docName = documents[path][name];
+    if (!docName) documents[path][name] = {};
+    documents[path][name][extension] = doc;
+
     // return the document
     if (debug) console.log(Date(), `retrieving document |./${path}/${name}.${extension}| from file`);
     return doc;

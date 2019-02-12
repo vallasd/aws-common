@@ -11,6 +11,8 @@ const actionDocJPG = require('./actions/document-jpg.js');
 const actionDocJSON = require('./actions/document-json.js');
 const actionDocTEXT = require('./actions/document-text.js');
 const actionDocXML = require('./actions/document-xml.js');
+const actionDocMemJPG = require('./actions/document-memory-jpg.js');
+const actionDocMemJSON = require('./actions/document-memory-json.js');
 const actionDynDelete = require('./actions/dynamo-delete.js');
 const actionDynGet = require('./actions/dynamo-get.js');
 const actionDynPost = require('./actions/dynamo-post.js');
@@ -44,6 +46,8 @@ module.exports = {
     { name: 'document/json', methods: ['GET'] },
     { name: 'document/text', methods: ['GET'] },
     { name: 'document/xml', methods: ['GET'] },
+    { name: 'document/memory/jpg', methods: ['GET'] },
+    { name: 'document/memory/json', methods: ['GET'] },
     { name: 'dynamo', methods: ['DELETE', 'GET', 'POST', 'PUT'] },
     { name: 'dynamo/query', methods: ['GET'] },
     { name: 'nextaction/1', methods: ['GET'] },
@@ -69,6 +73,8 @@ module.exports = {
     if (endpoint === 'document/json') return actionDocJSON.action();
     if (endpoint === 'document/text') return actionDocTEXT.action();
     if (endpoint === 'document/xml') return actionDocXML.action();
+    if (endpoint === 'document/memory/jpg') return actionDocMemJPG.action(previousResponse);
+    if (endpoint === 'document/memory/json') return actionDocMemJSON.action(previousResponse);
     if (endpoint === 'dynamo' && event.httpMethod === 'DELETE') return actionDynDelete.action(event);
     if (endpoint === 'dynamo' && event.httpMethod === 'GET') return actionDynGet.action(event);
     if (endpoint === 'dynamo' && event.httpMethod === 'POST') return actionDynPost.action(event);

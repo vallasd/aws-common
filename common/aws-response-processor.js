@@ -7,7 +7,6 @@
 // All Rights Reserved.
 
 const fetch = require('node-fetch');
-const fs = require('fs');
 const documentManager = require('./aws-document.js');
 const helper = require('./aws-helper.js');
 const secretManager = require('./aws-secret.js');
@@ -126,7 +125,7 @@ function document(params) {
       const headers = helper.updateContentTypeHeader({}, components.extension);
 
       // log additional info
-      if (debug) console.log(Date(), `ext: ${components.extension} headers: ${JSON.stringify(headers)}`);
+      if (debug) console.log(Date(), `ext: |${components.extension}| headers: |${JSON.stringify(headers)}|`);
 
       // return a lambda response
       return {
