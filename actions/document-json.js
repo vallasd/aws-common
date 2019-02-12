@@ -1,5 +1,5 @@
 exports.action = () => ({
   document: {
-    name: 'document.json',
+    path: 'documents/document.json',
   },
 });

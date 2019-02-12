@@ -1,4 +1,7 @@
 {
+  "dependencies": {
+    "node-fetch": "^2.2.0"
+  },
   "devDependencies": {
     "eslint": "^5.12.1",
     "eslint-config-airbnb-base": "^13.1.0",

@@ -77,6 +77,7 @@ async function processResponse(event, endpoint, previousResponse) {
     if (action.request) response = await processor.request(action.request);
     else if (action.response) response = action.response; // eslint-disable-line
     else if (action.secret) response = await processor.secret(action.secret, actionHandler.admin);
+    else if (action.document) response = await processor.document(action.document);
     else throw new Error(`|${endpoint}| failed to process`);
 
     // continue next actionHandler processing step (recursive)
@@ -139,15 +140,6 @@ exports.handler = async (event) => {
     // process the request to get the response
     response = await processResponse(processedEvent, endpoint);
 
-    // determine if intialization is needed during next call
-    setInitialization();
-
-    // convert json to string, TODO: make checking more robust
-    if (typeof response.body === 'object') {
-      if (debug) console.log(Date(), 'converting JSON body to string');
-      response.body = JSON.stringify(response.body);
-    }
-
     // check if response is valid, if not throw error
     if (response == null
       || response.body == null
@@ -155,6 +147,25 @@ exports.handler = async (event) => {
       || response.statusCode == null) {
       throw new Error('response not processed properly');
     }
+
+    // get docType from header
+    const docType = helper.docTypeForHeaders(response.headers);
+
+    // convert json to string, TODO: make checking more robust
+    if (typeof response.body === 'object'
+    && docType === helper.docType.json) {
+      if (debug) console.log(Date(), 'converting JSON body to string');
+      response.body = JSON.stringify(response.body);
+    }
+
+    // images need base64Encoded set to true
+    if (docType === helper.docType.jpg) {
+      if (debug) console.log(Date(), 'converting IMAGE body to base64Encoded');
+      response.isBase64Encoded = true;
+    }
+
+    // determine if intialization is needed during next call
+    setInitialization();
   } catch (err) {
     // create a valid error response
     response = helper.serverError(err, processedEvent, secret);

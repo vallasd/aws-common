@@ -6,10 +6,11 @@
 //
 // All Rights Reserved.
 
-const fetch = require('node-fetch'); // eslint-disable-line import/no-unresolved
+const fetch = require('node-fetch');
 const fs = require('fs');
-const secretManager = require('./aws-secret.js');
+const documentManager = require('./aws-document.js');
 const helper = require('./aws-helper.js');
+const secretManager = require('./aws-secret.js');
 
 const debug = (process.env.debug === 'true');
 
@@ -66,8 +67,8 @@ function request(params) {
         || type === docType.xml
         || type === docType.html) body = await result.text();
       else if (type === docType.jpg) {
-        const dest = fs.createWriteStream('./octocat.png');
-        body = await result.body.pipe(dest);
+        const data = await result.buffer();
+        body = data.toString('base64');
       } else throw new Error(`process |request| unable to parse docType |${type}|`);
 
       // return a lambda response
@@ -112,11 +113,38 @@ function secret(params, admin) {
   return process();
 }
 
+function document(params) {
+  const process = async () => {
+    try {
+      const components = helper.splitDoc(params.path);
+      const doc = await documentManager.get(components.path, components.name, components.extension);
+
+      // throw error if secret not returned
+      if (doc == null) throw new Error(`process |document| unable to |GET| document |${params.path}|`);
+
+      // set headers
+      const headers = helper.updateContentTypeHeader({}, components.extension);
+
+      // log additional info
+      if (debug) console.log(Date(), `ext: ${components.extension} headers: ${JSON.stringify(headers)}`);
+
+      // return a lambda response
+      return {
+        headers,
+        body: doc,
+        statusCode: 200,
+      };
+    } catch (error) { throw error; }
+  };
+
+  return process();
+}
+
 module.exports = {
 
   /*
-      *These properties are part of the Fetch Standard (requestParams)
-      method: 'GET',
+      requestParams
+      method: 'GET'
       headers: {},              request headers. format is the identical to
                                 that accepted by the Headers constructor (see below)
       body: null,               request body. can be null, a string, a Buffer, a Blob,
@@ -149,4 +177,11 @@ module.exports = {
   // stores or retrieves secret, formatted for AWS Lambda response
   secret(params, admin) { return secret(params, admin); },
 
+  /*
+    documentParams
+    path:   null    path of document you are trying to get
+  */
+
+  // retrieves a lambda document
+  document(params) { return document(params); },
 };

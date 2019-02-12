@@ -1,5 +1,5 @@
 exports.action = () => ({
   document: {
-    name: 'document.text',
+    path: 'documents/document.text',
   },
 });

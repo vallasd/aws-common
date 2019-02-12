@@ -14,8 +14,29 @@ const docType = {
   xml: 'xml',
 };
 
+function splitDoc(fullpath) {
+  if (fullpath) {
+    const pathComponents = fullpath.split('/');
+    if (pathComponents.length > 1) {
+      const documentNameAndExtension = pathComponents[pathComponents.length - 1];
+      pathComponents.pop();
+      const path = pathComponents.join('/');
+      const doc = documentNameAndExtension.split('.');
+      if (doc.length === 2) {
+        return {
+          path,
+          name: doc[0],
+          extension: doc[1],
+        };
+      }
+    }
+  }
+  throw new Error(`documentPath |${fullpath}| not valid format`);
+}
+
 function docTypeForHeaders(headers) {
-  const ct = headers.get('Content-Type');
+  let ct = headers['Content-Type'];
+  if (!ct) ct = headers.get('Content-Type');
   const c = ct.split(';')[0];
   if (c === 'application/json') return docType.json;
   if (c === 'text/json') return docType.json;
@@ -24,15 +45,16 @@ function docTypeForHeaders(headers) {
   if (c === 'text/html') return docType.html;
   if (c === 'application/xml') return docType.xml;
   if (c === 'text/xml') return docType.xml;
-  return docType.json;
+  return docType.text;
 }
 
 function updateContentTypeHeader(headers, doctype) {
   const newHeaders = headers;
-  if (doctype === 'json') newHeaders['Content-Type'] = 'text/plain';
+  if (doctype === 'json') newHeaders['Content-Type'] = 'text/json';
   else if (doctype === 'jpg') newHeaders['Content-Type'] = 'image/jpeg';
-  else if (doctype === 'text') newHeaders['Content-Type'] = 'text/json';
   else if (doctype === 'html') newHeaders['Content-Type'] = 'text/html';
+  else if (doctype === 'text') newHeaders['Content-Type'] = 'text/plain';
+  else if (doctype === 'txt') newHeaders['Content-Type'] = 'text/plain';
   else if (doctype === 'xml') newHeaders['Content-Type'] = 'text/xml';
   else throw new Error(`doctype |${doctype}| not recognized`);
   return newHeaders;
@@ -236,6 +258,9 @@ module.exports = {
 
   // different types of docs used in aws-common
   docType,
+
+  // splits a document into its path, name, extension, throws if cannot determine these values
+  splitDoc(documentName) { return splitDoc(documentName); },
 
   // determines the appropriate docType given headers (defaults to JSON)
   docTypeForHeaders(headers) { return docTypeForHeaders(headers); },

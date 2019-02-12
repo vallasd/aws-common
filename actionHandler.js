@@ -36,7 +36,7 @@ const actionSmsPost = require('./actions/sms-post.js');
 module.exports = {
 
   admin: true,
-  secretInMemory: true,
+  secretInMemory: false,
 
   endpointData: [
     { name: 'document/html', methods: ['GET'] },
