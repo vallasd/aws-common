@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "fef0bf95-ab7a-4716-a6cb-8025e28ec48b",
-		"name": "AWS-Common",
+		"name": "aws-common",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
