@@ -1,0 +1,1077 @@
+{
+	"info": {
+		"_postman_id": "fef0bf95-ab7a-4716-a6cb-8025e28ec48b",
+		"name": "AWS-Common",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "badMethod",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/document/html",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"document",
+						"html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "badEndpoint",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/badEndpoint",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"badEndpoint"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "document/html",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/document/html",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"document",
+						"html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "document/jpg",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/document/jpg",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"document",
+						"jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "document/json",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/document/json",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"document",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "document/text",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/document/text",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"document",
+						"text"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "document/xml",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/document/xml",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"document",
+						"xml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "document/memory/jpg",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/document/memory/jpg",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"document",
+						"memory",
+						"jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "document/memory/json",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/document/memory/json",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"document",
+						"memory",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dynamo",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/dynamo",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"dynamo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dynamo",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/dynamo",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"dynamo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dynamo",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/dynamo",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"dynamo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dynamo",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/dynamo",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"dynamo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "dynamo/query",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/dynamo/query",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"dynamo",
+						"query"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nextaction/1",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/nextaction/1",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"nextaction",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "nextaction/2",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/nextaction/2",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"nextaction",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "push",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/push",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"push"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request/html",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/request/html",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"request",
+						"html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request/jpg",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/request/jpg",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"request",
+						"jpg"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request/json",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/request/json",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"request",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request/text",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/request/text",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"request",
+						"text"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "request/xml",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/request/xml",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"request",
+						"xml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "response/html",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/response/html",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"response",
+						"html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "response/json",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/response/json",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"response",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "response/text",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/response/text",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"response",
+						"text"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "response/xml",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/response/xml",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"response",
+						"xml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "secret",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/secret",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"secret"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "secretWest",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/secret?region=us-west-1",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"secret"
+					],
+					"query": [
+						{
+							"key": "region",
+							"value": "us-west-1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "secret",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/javascript",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"key\": \"us-east-1 secret\"\n}"
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/secret",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"secret"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "secret?region=ws-west-1",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"key\": \"us-west-1 secret\"\n}"
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/secret?region=us-west-1",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"secret"
+					],
+					"query": [
+						{
+							"key": "region",
+							"value": "us-west-1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "secret/memory",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/secret/memory",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"secret",
+						"memory"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sms",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{x-api-key}}"
+					},
+					{
+						"key": "Partner-ID",
+						"value": "{{partner-id}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{baseurl}}/common/{{version}}/sms",
+					"host": [
+						"{{baseurl}}"
+					],
+					"path": [
+						"common",
+						"{{version}}",
+						"sms"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
