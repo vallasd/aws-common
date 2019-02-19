@@ -15,7 +15,7 @@ exports.action = (previousResponse) => {
 
   return {
     response: {
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'text/json' },
       body,
       statusCode: 200,
     },
